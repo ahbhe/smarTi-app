@@ -3,15 +3,18 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 import 'screens/bluetooth_off_screen.dart';
 import 'screens/scan_screen.dart';
 
 void main() {
-  FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
+  //FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
+  FlutterForegroundTask.initCommunicationPort();
   runApp(const FlutterBlueApp());
 }
 
@@ -45,6 +48,7 @@ class _FlutterBlueAppState extends State<FlutterBlueApp> {
   @override
   void dispose() {
     _adapterStateStateSubscription.cancel();
+
     super.dispose();
   }
 
