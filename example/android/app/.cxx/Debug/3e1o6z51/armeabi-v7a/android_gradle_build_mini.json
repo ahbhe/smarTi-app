@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "/home/andrea/Desktop/flutter da non toccare/flutter/packages/flutter_tools/gradle/src/main/groovy/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/home/andrea/Android/Sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/home/andrea/Desktop/smarti/flutter_blue_plus-master (2)/example/android/app/.cxx/Debug/3e1o6z51/armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/home/andrea/Android/Sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/home/andrea/Desktop/smarti/flutter_blue_plus-master (2)/example/android/app/.cxx/Debug/3e1o6z51/armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}
