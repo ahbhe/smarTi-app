@@ -34,11 +34,43 @@ class MyTaskHandler extends TaskHandler {
   // Called based on the eventAction set in ForegroundTaskOptions.
   @override
   void onRepeatEvent(DateTime timestamp) {
-    // Send data to main isolate.
-    final Map<String, dynamic> data = {
-      "timestampMillis": timestamp.millisecondsSinceEpoch,
-    };
-    FlutterForegroundTask.sendDataToMain(data);
+  FlutterBluePlus.startScan(timeout: Duration(seconds:1)); //ogni 20 secondi cerca per 5 secondi
+  Future.delayed(Duration(milliseconds: 500));
+
+  if(FlutterBluePlus.isScanningNow){
+    print("Scanning...");
+  }
+
+    FlutterBluePlus.scanResults.listen((results) async {
+      for (var ScanResult in  results) {
+        if (ScanResult.device.advName == "smarti") {
+          await ScanResult.device.connect();
+          debugPrint("si caro");
+          
+          FlutterForegroundTask.sendDataToMain("connesso");
+
+          FlutterBluePlus.stopScan();
+          List<BluetoothService> services = await ScanResult.device.discoverServices();
+          for (BluetoothService service in services) {
+            if (service.serviceUuid == Guid("1234")) {
+              try {
+                List<BluetoothCharacteristic> characteristics = await service.characteristics;
+                for (BluetoothCharacteristic characteristic in characteristics) {
+                  if(characteristic.uuid == Guid("5678") && characteristic.properties.read) {
+                    List<int> value = await characteristic.read();
+                    debugPrint("Value: $value");
+                  }
+                }
+              } catch (e) {
+                print("Error: $e");
+              }
+            }
+          }
+        }
+      }
+    }, onError: (e) {
+      print("Scan Error: $e");
+    });
   }
 
   // Called when the task is destroyed.
@@ -117,6 +149,7 @@ class _FlutterBlueAppState extends State<FlutterBlueApp> {
         await FlutterForegroundTask.openAlarmsAndRemindersSettings();
       }
     }
+    
   }
 
   void _initService() {
@@ -132,7 +165,7 @@ class _FlutterBlueAppState extends State<FlutterBlueApp> {
         playSound: false,
       ),
       foregroundTaskOptions: ForegroundTaskOptions(
-        eventAction: ForegroundTaskEventAction.repeat(5000),
+        eventAction: ForegroundTaskEventAction.repeat(20000), //ogni 20 secondi cerca per 15 secondi
         autoRunOnBoot: true,
         autoRunOnMyPackageReplaced: true,
         allowWakeLock: true,
@@ -147,7 +180,7 @@ Future<ServiceRequestResult> _startService() async {
     } else {
       return FlutterForegroundTask.startService(
         serviceId: 256,
-        notificationTitle: 'SmarTi attiva in background',
+        notificationTitle: 'Stato connessione: disconnesso',
         notificationText: 'Tocca per tornare in app',
         notificationIcon: null,
         notificationButtons: [
@@ -164,12 +197,11 @@ Future<ServiceRequestResult> _startService() async {
   }
 
   void _onReceiveTaskData(Object data) {
-    if (data is Map<String, dynamic>) {
-      final dynamic timestampMillis = data["timestampMillis"];
-      if (timestampMillis != null) {
-        final DateTime timestamp = DateTime.fromMillisecondsSinceEpoch(timestampMillis, isUtc: true);
-        print('timestamp: ${timestamp.toString()}');
-      }
+    if(data is String){
+      FlutterForegroundTask.updateService(
+            notificationTitle: 'Stato connessione: connesso',
+            notificationText: 'Tocca per tornare in app',
+          );
     }
   }
 
