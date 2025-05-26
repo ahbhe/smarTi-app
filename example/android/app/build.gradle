@@ -1,5 +1,8 @@
 plugins {
     id "com.android.application"
+    // START: FlutterFire Configuration
+    id 'com.google.gms.google-services'
+    // END: FlutterFire Configuration
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -52,6 +55,11 @@ android {
     if (project.android.hasProperty("namespace")) {
         namespace 'com.lib.flutter_blue_plus_example'
     }
+}
+
+dependencies{
+    implementation platform('com.google.firebase:firebase-bom:33.13.0')
+    implementation 'com.google.firebase:firebase-analytics'
 }
 
 flutter {

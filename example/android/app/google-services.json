@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1027520855659",
+    "firebase_url": "https://smarti-5beaa-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "smarti-5beaa",
+    "storage_bucket": "smarti-5beaa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1027520855659:android:bac1a4d48d7a8ed97afb2e",
+        "android_client_info": {
+          "package_name": "com.lib.flutter_blue_plus_example"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBs1Dvs9xtZN7AnTlK8Eae7LWm6EhTww_U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
