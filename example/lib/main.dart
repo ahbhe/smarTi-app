@@ -13,11 +13,46 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'screens/bluetooth_off_screen.dart';
 import 'screens/scan_screen.dart';
 
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+void main() async {
   //FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
-  FlutterForegroundTask.initCommunicationPort();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  try {
+    final credential =
+        await FirebaseAuth.instance.signInWithEmailAndPassword(email: "a.b@gmail.com", password: "Password1234");
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found') {
+      print('No user found for that email.');
+    } else if (e.code == 'wrong-password') {
+      print('Wrong password provided for that user.');
+    }
+  }
+
   var db = FirebaseFirestore.instance;
-  var app = db.collection("passaggi").get();
+  db.settings = const Settings(persistenceEnabled: true, cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
+
+  final city = <String, String>{"name": "Alba", "state": "CN", "country": "ITALIA"};
+
+  db
+      .collection("passaggi")
+      .doc("Alba")
+      .set(city)
+      .then((_) => print("Document successfully written!"))
+      .onError((e, _) => print("Error writing document: $e"));
+  final docRef = db.collection("passaggi").doc("Alba");
+  docRef.get().then(
+    (DocumentSnapshot doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      debugPrint(data.toString());
+    },
+    onError: (e) => print("Error getting document: $e"),
+  );
+
+  FlutterForegroundTask.initCommunicationPort();
   runApp(const FlutterBlueApp());
 }
 
@@ -37,19 +72,19 @@ class MyTaskHandler extends TaskHandler {
   // Called based on the eventAction set in ForegroundTaskOptions.
   @override
   void onRepeatEvent(DateTime timestamp) {
-  FlutterBluePlus.startScan(timeout: Duration(seconds:1)); //ogni 20 secondi cerca per 5 secondi
-  Future.delayed(Duration(milliseconds: 500));
+    FlutterBluePlus.startScan(timeout: Duration(seconds: 1)); //ogni 20 secondi cerca per 5 secondi
+    Future.delayed(Duration(milliseconds: 500));
 
-  if(FlutterBluePlus.isScanningNow){
-    print("Scanning...");
-  }
+    if (FlutterBluePlus.isScanningNow) {
+      print("Scanning...");
+    }
 
     FlutterBluePlus.scanResults.listen((results) async {
-      for (var ScanResult in  results) {
+      for (var ScanResult in results) {
         if (ScanResult.device.advName == "smarti") {
           await ScanResult.device.connect();
           debugPrint("si caro");
-          
+
           FlutterForegroundTask.sendDataToMain("connesso");
 
           FlutterBluePlus.stopScan();
@@ -59,7 +94,7 @@ class MyTaskHandler extends TaskHandler {
               try {
                 List<BluetoothCharacteristic> characteristics = await service.characteristics;
                 for (BluetoothCharacteristic characteristic in characteristics) {
-                  if(characteristic.uuid == Guid("5678") && characteristic.properties.read) {
+                  if (characteristic.uuid == Guid("5678") && characteristic.properties.read) {
                     List<int> value = await characteristic.read();
                     debugPrint("Value: $value");
                   }
@@ -152,7 +187,6 @@ class _FlutterBlueAppState extends State<FlutterBlueApp> {
         await FlutterForegroundTask.openAlarmsAndRemindersSettings();
       }
     }
-    
   }
 
   void _initService() {
@@ -177,7 +211,7 @@ class _FlutterBlueAppState extends State<FlutterBlueApp> {
     );
   }
 
-Future<ServiceRequestResult> _startService() async {
+  Future<ServiceRequestResult> _startService() async {
     if (await FlutterForegroundTask.isRunningService) {
       return FlutterForegroundTask.restartService();
     } else {
@@ -200,11 +234,11 @@ Future<ServiceRequestResult> _startService() async {
   }
 
   void _onReceiveTaskData(Object data) {
-    if(data is String){
+    if (data is String) {
       FlutterForegroundTask.updateService(
-            notificationTitle: 'Stato connessione: connesso',
-            notificationText: 'Tocca per tornare in app',
-          );
+        notificationTitle: 'Stato connessione: connesso',
+        notificationText: 'Tocca per tornare in app',
+      );
     }
   }
 

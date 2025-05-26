@@ -1,0 +1,1 @@
+/home/andrea/Desktop/smarti/flutter_blue_plus-master (2)/example/build/app/intermediates/cxx/Debug/1o14596j/obj/x86_64

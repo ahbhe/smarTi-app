@@ -5,6 +5,8 @@
 <!-- foregroundServiceType: dataSync -->
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
+<uses-permission android:name="android.permission.INTERNET"/>
+
 <!-- foregroundServiceType: remoteMessaging -->
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING" />
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />

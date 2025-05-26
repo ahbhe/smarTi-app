@@ -60,4 +60,5 @@ class DefaultFirebaseOptions {
     databaseURL: 'https://smarti-5beaa-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'smarti-5beaa.firebasestorage.app',
   );
+
 }
